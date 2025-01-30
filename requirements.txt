@@ -1,0 +1,16 @@
+certifi==2024.12.14
+charset-normalizer==3.4.1
+colorama==0.4.6
+dnspython==2.7.0
+idna==3.10
+pillow==11.1.0
+pymongo==4.10.1
+readerwriterlock==1.0.9
+redis==5.2.1
+requests==2.32.3
+spotapi==1.1.3
+tls-client==1.0.1
+typing_extensions==4.12.2
+urllib3==2.3.0
+validators==0.34.0
+websockets==14.2
