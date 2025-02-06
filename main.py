@@ -2,6 +2,9 @@ from spotapi import Public
 from innertube import InnerTube
 from yt_dlp import YoutubeDL
 
+from time import sleep
+from random import uniform
+
 def extract_playlist_id(url):
     if "open.spotify.com" in url:
         return url.lstrip("https://open.spotify.com/playlist/").split("?si=")[0]
@@ -44,21 +47,37 @@ def get_song_urls(titles):
     """Repeatedly calls get_song_url on given titles. Return list of results."""
     urls = []
     for title in titles:
-        urls.append(get_song_url(song))
+        urls.append(get_song_url(title))
+        sleep(uniform(1, 3))
 
     return urls
 
 def download_from_urls(urls):
     """Downloads list of songs with yt-dlp"""
-    options = {
-        "format": "m4a/bestaudio/best",
-        "outtmpl": "%(title)s.%(ext)s",
-        "postprocessors": [{
-            "key": "FFmpegExtractAudio",
-            "preferredcodec": "m4a",
-        }]
-    }
-    with YoutubeDL(options) as ydl:
-        error_code = ydl.download(urls)
+
+    # options generated from https://github.com/yt-dlp/yt-dlp/blob/master/devscripts/cli_to_api.py
+    options = {'extract_flat': 'discard_in_playlist',
+         "final_ext": "m4a",
+         "format": "bestaudio/best",
+         "fragment_retries": 10,
+         'ignoreerrors': 'only_download',
+         'outtmpl': {'default': '%(title)s.%(ext)s'},
+         'postprocessors': [{'key': 'FFmpegExtractAudio',
+                             'nopostoverwrites': False,
+                             'preferredcodec': 'm4a',
+                             'preferredquality': '5'},
+                            {'key': 'FFmpegConcat',
+                             'only_multi_video': True,
+                             'when': 'playlist'}],
+         'retries': 10}
     
-    print(error_code)
+    with YoutubeDL(options) as ydl:
+        ydl.download(urls)
+    
+def main(playlist_id):
+    titles = get_playlist_titles(playlist_id)
+    download_urls = get_song_urls(titles)
+    download_from_urls(download_urls)
+    
+if __name__ == "__main__":
+    main("https://open.spotify.com/playlist/2LE8ZObOZOqjsGrR6QFXwu?si=9b4a5deb005148e1") # test
