@@ -41,6 +41,7 @@ def get_song_url(search_text):
     return url
 
 def get_song_urls(titles):
+    """Repeatedly calls get_song_url on given titles. Return list of results."""
     urls = []
     for title in titles:
         urls.append(get_song_url(song))
@@ -48,6 +49,7 @@ def get_song_urls(titles):
     return urls
 
 def download_from_urls(urls):
+    """Downloads list of songs with yt-dlp"""
     options = {
         "format": "m4a/bestaudio/best",
         "outtmpl": "%(title)s.%(ext)s",
