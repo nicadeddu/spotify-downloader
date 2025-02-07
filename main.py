@@ -47,7 +47,10 @@ def get_song_urls(titles):
     """Repeatedly calls get_song_url on given titles. Return list of results."""
     urls = []
     for title in titles:
-        urls.append(get_song_url(title))
+        print(f"Getting url for {title}")
+        result = get_song_url(title)
+        urls.append(result)
+        print(f"{title}: {result}")
         sleep(uniform(1, 3))
 
     return urls
