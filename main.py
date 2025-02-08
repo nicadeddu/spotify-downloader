@@ -7,7 +7,8 @@ from random import uniform
 
 def extract_playlist_id(url):
     if "open.spotify.com" in url:
-        return url.lstrip("https://open.spotify.com/playlist/").split("?si=")[0]
+        url = url.lstrip("https://open.spotify.com/playlist/").split("?si=")[0]
+    return url
     
 def get_playlist_titles(playlist_id):
     """Returns list of song titles with artist names in specified playlist."""
