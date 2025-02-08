@@ -19,7 +19,7 @@ This program uses YouTube Music as the source for music downloads, there is a ch
 main(playlist_url)
 ```
 ```sh
-python -m run <playlist_url>
+python -m cli <playlist_url>
 ```
 
 ## Dependencies
