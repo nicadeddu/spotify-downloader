@@ -4,11 +4,6 @@ from yt_dlp import YoutubeDL
 
 from time import sleep
 from random import uniform
-
-def extract_playlist_id(url):
-    if "open.spotify.com" in url:
-        url = url.lstrip("https://open.spotify.com/playlist/").split("?si=")[0]
-    return url
     
 def get_playlist_info(playlist_id):
     """Extracts data from Spotify and return them in format
