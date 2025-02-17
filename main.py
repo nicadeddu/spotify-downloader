@@ -5,6 +5,7 @@ from yt_dlp import YoutubeDL
 from time import sleep
 from random import uniform
     
+DOWNLOAD_PATH = "./downloads/" # ends with "/"
 client = None
 
 def get_playlist_info(playlist_id):
@@ -74,19 +75,19 @@ def download_from_urls(urls):
     """Downloads list of songs with yt-dlp"""
 
     # options generated from https://github.com/yt-dlp/yt-dlp/blob/master/devscripts/cli_to_api.py
-    options = {'extract_flat': 'discard_in_playlist',
+    options = {"extract_flat": "discard_in_playlist",
          "final_ext": "m4a",
          "format": "bestaudio/best",
          "fragment_retries": 10,
-         'ignoreerrors': 'only_download',
-         'outtmpl': {'default': '%(title)s.%(ext)s'},
-         'postprocessors': [{'key': 'FFmpegExtractAudio',
-                             'nopostoverwrites': False,
-                             'preferredcodec': 'm4a',
-                             'preferredquality': '5'},
-                            {'key': 'FFmpegConcat',
-                             'only_multi_video': True,
-                             'when': 'playlist'}],
+         "ignoreerrors": "only_download",
+         "outtmpl": {"default": f"{DOWNLOAD_PATH}%(title)s.%(ext)s"},
+         "postprocessors": [{"key": "FFmpegExtractAudio",
+                             "nopostoverwrites": False,
+                             "preferredcodec": "m4a",
+                             "preferredquality": "5"},
+                            {"key": "FFmpegConcat",
+                             "only_multi_video": True,
+                             "when": "playlist"}],
          'retries': 10}
 
     # downloads stream with highest bitrate, then save them in m4a format
