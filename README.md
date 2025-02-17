@@ -6,6 +6,7 @@ Downloads Spotify playlists in under 100 lines of code.
 - No premium required
 - No login required
 - Lightweight
+- Downloads in higher bitrate (around 256 kbps)
 
 ## Warning
 This program uses YouTube Music as the source for music downloads, there is a chance of mismatching.
