@@ -5,6 +5,8 @@ from yt_dlp import YoutubeDL
 from time import sleep
 from random import uniform
     
+client = None
+
 def get_playlist_info(playlist_id):
     """Extracts data from Spotify and return them in format
        `[{"title": title, "artist": artist, "length": length}]`."""
@@ -31,7 +33,9 @@ def convert_to_milliseconds(text):
 def get_song_url(song_info):
     """Simulates searching from the YTMusic web and returns url to closest match."""
 
-    client = InnerTube("WEB_REMIX", "1.20250203.01.00")
+    global client
+    if client is None:
+        client = InnerTube("WEB_REMIX", "1.20250203.01.00")
     data = client.search(f"{song_info['title']} {song_info['artist']}")
 
     top_result_length = data["contents"]["tabbedSearchResultsRenderer"]["tabs"][0]["tabRenderer"]["content"]["sectionListRenderer"]["contents"][0]["musicCardShelfRenderer"]["subtitle"]["runs"][-1]["text"]
