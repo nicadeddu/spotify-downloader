@@ -32,7 +32,5 @@ python -m cli <playlist_url>
 
 Alternatively, install from [requirements.txt](requirements.txt) (and FFmpeg build from the official website).
 
-**Extra notes**: As of 6/2/2025, installing SpotAPI from pip requires manually adding this [fix](https://github.com/Aran404/SpotAPI/commit/e2e3b642d6d9244b49488e0918ee8eda0419a3e2) for it to work.
-
 ## License
 This software is licensed under the [MIT License](https://github.com/invzfnc/spotify-downloader/blob/main/LICENSE) © [Cha](https://github.com/invzfnc)
