@@ -29,5 +29,8 @@ Unlike most downloader, this program does not require a Spotify Developers accou
 
 Alternatively, install from [requirements.txt](requirements.txt) using pip (and FFmpeg build from the official website).
 
+## Contributing
+Contributions are welcome! Please open an issue or submit a pull request if you find issues or have suggestions.
+
 ## License
 This software is licensed under the [MIT License](https://github.com/invzfnc/spotify-downloader/blob/main/LICENSE) © [Cha](https://github.com/invzfnc)
