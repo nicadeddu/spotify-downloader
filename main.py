@@ -11,23 +11,23 @@ DOWNLOAD_PATH = "./downloads/" # ends with "/"
 client = None
 
 
-class PlaylistData(TypedDict):
+class PlaylistInfo(TypedDict):
     title: str
     artist: str
     length: int
 
 
-def get_playlist_info(playlist_id: str) -> list[PlaylistData]:
+def get_playlist_info(playlist_id: str) -> list[PlaylistInfo]:
     """Extracts data from Spotify and return them in format
        `[{"title": title, "artist": artist, "length": length}]`."""
 
     items = next(Public.playlist_info(playlist_id))["items"]
 
-    result: list[PlaylistData] = []
+    result: list[PlaylistInfo] = []
 
     for item in items:
         item = item["itemV2"]["data"]
-        song: PlaylistData = {
+        song: PlaylistInfo = {
             'title': item['name'],
             'artist': item["artists"]["items"][0]["profile"]["name"],
             'length': int(item["trackDuration"]["totalMilliseconds"])
@@ -43,7 +43,7 @@ def convert_to_milliseconds(text: str) -> int:
     return (int(minutes) * 60 + int(seconds)) * 1000
 
 
-def get_song_url(song_info: PlaylistData) -> tuple[str, str]:
+def get_song_url(song_info: PlaylistInfo) -> tuple[str, str]:
     """Simulates searching from the YTMusic web and returns url to closest match."""
 
     global client
@@ -75,7 +75,7 @@ def get_song_url(song_info: PlaylistData) -> tuple[str, str]:
     return url, video_title
 
 
-def get_song_urls(playlist_info: list[PlaylistData]) -> list[str]:
+def get_song_urls(playlist_info: list[PlaylistInfo]) -> list[str]:
     """Repeatedly calls get_song_url on given playlist info. Returns list of results."""
     urls = []
 
