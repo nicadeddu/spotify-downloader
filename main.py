@@ -7,7 +7,7 @@ from yt_dlp import YoutubeDL
 from time import sleep
 from random import uniform
 
-DOWNLOAD_PATH = "./downloads/" # ends with "/"
+DOWNLOAD_PATH = "./downloads/"  # ends with "/"
 client = None
 
 
@@ -28,9 +28,9 @@ def get_playlist_info(playlist_id: str) -> list[PlaylistInfo]:
     for item in items:
         item = item["itemV2"]["data"]
         song: PlaylistInfo = {
-            'title': item['name'],
-            'artist': item["artists"]["items"][0]["profile"]["name"],
-            'length': int(item["trackDuration"]["totalMilliseconds"])
+            "title": item["name"],
+            "artist": item["artists"]["items"][0]["profile"]["name"],
+            "length": int(item["trackDuration"]["totalMilliseconds"])
         }
         result.append(song)
 
@@ -44,7 +44,8 @@ def convert_to_milliseconds(text: str) -> int:
 
 
 def get_song_url(song_info: PlaylistInfo) -> tuple[str, str]:
-    """Simulates searching from the YTMusic web and returns url to closest match."""
+    """Simulates searching from the YTMusic web and returns url to the
+    closest match."""
 
     global client
     if client is None:
@@ -52,23 +53,23 @@ def get_song_url(song_info: PlaylistInfo) -> tuple[str, str]:
     data = client.search(f"{song_info['title']} {song_info['artist']}")
 
     # handle "did you mean" case
-    if "itemSectionRenderer" in data["contents"]["tabbedSearchResultsRenderer"]["tabs"][0]["tabRenderer"]["content"]["sectionListRenderer"]["contents"][0]:
-        del data["contents"]["tabbedSearchResultsRenderer"]["tabs"][0]["tabRenderer"]["content"]["sectionListRenderer"]["contents"][0]
+    if "itemSectionRenderer" in data["contents"]["tabbedSearchResultsRenderer"]["tabs"][0]["tabRenderer"]["content"]["sectionListRenderer"]["contents"][0]:  # noqa: E501
+        del data["contents"]["tabbedSearchResultsRenderer"]["tabs"][0]["tabRenderer"]["content"]["sectionListRenderer"]["contents"][0]  # noqa: E501
 
-    top_result_length = data["contents"]["tabbedSearchResultsRenderer"]["tabs"][0]["tabRenderer"]["content"]["sectionListRenderer"]["contents"][0]["musicCardShelfRenderer"]["subtitle"]["runs"][-1]["text"]
-    first_song_length = data["contents"]["tabbedSearchResultsRenderer"]["tabs"][0]["tabRenderer"]["content"]["sectionListRenderer"]["contents"][1]["musicShelfRenderer"]["contents"][0]["musicResponsiveListItemRenderer"]["flexColumns"][1]["musicResponsiveListItemFlexColumnRenderer"]["text"]["runs"][-1]["text"]
+    top_result_length = data["contents"]["tabbedSearchResultsRenderer"]["tabs"][0]["tabRenderer"]["content"]["sectionListRenderer"]["contents"][0]["musicCardShelfRenderer"]["subtitle"]["runs"][-1]["text"]  # noqa: E501
+    first_song_length = data["contents"]["tabbedSearchResultsRenderer"]["tabs"][0]["tabRenderer"]["content"]["sectionListRenderer"]["contents"][1]["musicShelfRenderer"]["contents"][0]["musicResponsiveListItemRenderer"]["flexColumns"][1]["musicResponsiveListItemFlexColumnRenderer"]["text"]["runs"][-1]["text"]  # noqa: E501
 
-    top_result_diff = abs(convert_to_milliseconds(top_result_length) - song_info["length"])
-    first_song_diff = abs(convert_to_milliseconds(first_song_length) - song_info["length"])
+    top_result_diff = abs(convert_to_milliseconds(top_result_length) - song_info["length"])  # noqa: E501
+    first_song_diff = abs(convert_to_milliseconds(first_song_length) - song_info["length"])  # noqa: E501
 
     if top_result_diff < first_song_diff:
         # get top result url
-        video_id = data["contents"]["tabbedSearchResultsRenderer"]["tabs"][0]["tabRenderer"]["content"]["sectionListRenderer"]["contents"][0]["musicCardShelfRenderer"]["title"]["runs"][0]["navigationEndpoint"]["watchEndpoint"]["videoId"]
-        video_title = data["contents"]["tabbedSearchResultsRenderer"]["tabs"][0]["tabRenderer"]["content"]["sectionListRenderer"]["contents"][0]["musicCardShelfRenderer"]["title"]["runs"][0]["text"]
+        video_id = data["contents"]["tabbedSearchResultsRenderer"]["tabs"][0]["tabRenderer"]["content"]["sectionListRenderer"]["contents"][0]["musicCardShelfRenderer"]["title"]["runs"][0]["navigationEndpoint"]["watchEndpoint"]["videoId"]  # noqa: E501
+        video_title = data["contents"]["tabbedSearchResultsRenderer"]["tabs"][0]["tabRenderer"]["content"]["sectionListRenderer"]["contents"][0]["musicCardShelfRenderer"]["title"]["runs"][0]["text"]  # noqa: E501
     else:
         # get first song result url
-        video_id = data["contents"]["tabbedSearchResultsRenderer"]["tabs"][0]["tabRenderer"]["content"]["sectionListRenderer"]["contents"][1]["musicShelfRenderer"]["contents"][0]["musicResponsiveListItemRenderer"]["overlay"]["musicItemThumbnailOverlayRenderer"]["content"]["musicPlayButtonRenderer"]["playNavigationEndpoint"]["watchEndpoint"]["videoId"]
-        video_title = data["contents"]["tabbedSearchResultsRenderer"]["tabs"][0]["tabRenderer"]["content"]["sectionListRenderer"]["contents"][1]["musicShelfRenderer"]["contents"][0]["musicResponsiveListItemRenderer"]["flexColumns"][0]["musicResponsiveListItemFlexColumnRenderer"]["text"]["runs"][0]["text"]
+        video_id = data["contents"]["tabbedSearchResultsRenderer"]["tabs"][0]["tabRenderer"]["content"]["sectionListRenderer"]["contents"][1]["musicShelfRenderer"]["contents"][0]["musicResponsiveListItemRenderer"]["overlay"]["musicItemThumbnailOverlayRenderer"]["content"]["musicPlayButtonRenderer"]["playNavigationEndpoint"]["watchEndpoint"]["videoId"]  # noqa: E501
+        video_title = data["contents"]["tabbedSearchResultsRenderer"]["tabs"][0]["tabRenderer"]["content"]["sectionListRenderer"]["contents"][1]["musicShelfRenderer"]["contents"][0]["musicResponsiveListItemRenderer"]["flexColumns"][0]["musicResponsiveListItemFlexColumnRenderer"]["text"]["runs"][0]["text"]  # noqa: E501
 
     url = "https://music.youtube.com/watch?v=" + video_id
 
@@ -76,7 +77,8 @@ def get_song_url(song_info: PlaylistInfo) -> tuple[str, str]:
 
 
 def get_song_urls(playlist_info: list[PlaylistInfo]) -> list[str]:
-    """Repeatedly calls get_song_url on given playlist info. Returns list of results."""
+    """Repeatedly calls get_song_url on given playlist info. Returns
+    list of results."""
     urls = []
 
     for song_info in playlist_info:
@@ -92,25 +94,25 @@ def get_song_urls(playlist_info: list[PlaylistInfo]) -> list[str]:
 def download_from_urls(urls: list[str]) -> None:
     """Downloads list of songs with yt-dlp"""
 
-    # options generated from https://github.com/yt-dlp/yt-dlp/blob/master/devscripts/cli_to_api.py
+    # options generated from https://github.com/yt-dlp/yt-dlp/blob/master/devscripts/cli_to_api.py  # noqa: E501
     options = {"extract_flat": "discard_in_playlist",
-         "final_ext": "m4a",
-         "format": "bestaudio/best",
-         "fragment_retries": 10,
-         "ignoreerrors": "only_download",
-         "outtmpl": {"default": f"{DOWNLOAD_PATH}%(title)s.%(ext)s"},
-         "postprocessors": [{"key": "FFmpegExtractAudio",
-                             "nopostoverwrites": False,
-                             "preferredcodec": "m4a",
-                             "preferredquality": "5"},
-                            {"add_chapters": True,
-                             "add_infojson": 'if_exists',
-                             "add_metadata": True,
-                             "key": "FFmpegMetadata"},
-                            {"key": "FFmpegConcat",
-                             "only_multi_video": True,
-                             "when": "playlist"}],
-         'retries': 10}
+               "final_ext": "m4a",
+               "format": "bestaudio/best",
+               "fragment_retries": 10,
+               "ignoreerrors": "only_download",
+               "outtmpl": {"default": f"{DOWNLOAD_PATH}%(title)s.%(ext)s"},
+               "postprocessors": [{"key": "FFmpegExtractAudio",
+                                   "nopostoverwrites": False,
+                                   "preferredcodec": "m4a",
+                                   "preferredquality": "5"},
+                                  {"add_chapters": True,
+                                   "add_infojson": "if_exists",
+                                   "add_metadata": True,
+                                   "key": "FFmpegMetadata"},
+                                  {"key": "FFmpegConcat",
+                                   "only_multi_video": True,
+                                   "when": "playlist"}],
+               "retries": 10}
 
     # downloads stream with highest bitrate, then save them in m4a format
     with YoutubeDL(options) as ydl:
@@ -124,4 +126,5 @@ def main(playlist_id: str):
 
 
 if __name__ == "__main__":
-    main("https://open.spotify.com/playlist/2LE8ZObOZOqjsGrR6QFXwu?si=9b4a5deb005148e1") # test
+    url = "https://open.spotify.com/playlist/2LE8ZObOZOqjsGrR6QFXwu?si=9b4a5deb005148e1"  # noqa: E501
+    main(url)  # test
