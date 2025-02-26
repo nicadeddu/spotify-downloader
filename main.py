@@ -1,37 +1,49 @@
+from typing import TypedDict
+
 from spotapi import Public
 from innertube import InnerTube
 from yt_dlp import YoutubeDL
 
 from time import sleep
 from random import uniform
-    
+
 DOWNLOAD_PATH = "./downloads/" # ends with "/"
 client = None
 
-def get_playlist_info(playlist_id):
+
+class PlaylistInfo(TypedDict):
+    title: str
+    artist: str
+    length: int
+
+
+def get_playlist_info(playlist_id: str) -> list[PlaylistInfo]:
     """Extracts data from Spotify and return them in format
        `[{"title": title, "artist": artist, "length": length}]`."""
 
     items = next(Public.playlist_info(playlist_id))["items"]
 
-    result = []
-    
+    result: list[PlaylistInfo] = []
+
     for item in items:
-        song = {}
         item = item["itemV2"]["data"]
-        song["title"] = item["name"]
-        song["artist"] = item["artists"]["items"][0]["profile"]["name"]
-        song["length"] = int(item["trackDuration"]["totalMilliseconds"])
+        song: PlaylistInfo = {
+            'title': item['name'],
+            'artist': item["artists"]["items"][0]["profile"]["name"],
+            'length': int(item["trackDuration"]["totalMilliseconds"])
+        }
         result.append(song)
 
     return result
 
-def convert_to_milliseconds(text):
+
+def convert_to_milliseconds(text: str) -> int:
     """Converts `"%M:%S"` timestamp from YTMusic to milliseconds."""
     minutes, seconds = text.split(":")
     return (int(minutes) * 60 + int(seconds)) * 1000
-    
-def get_song_url(song_info):
+
+
+def get_song_url(song_info: PlaylistInfo) -> tuple[str, str]:
     """Simulates searching from the YTMusic web and returns url to closest match."""
 
     global client
@@ -62,20 +74,22 @@ def get_song_url(song_info):
 
     return url, video_title
 
-def get_song_urls(playlist_info):
+
+def get_song_urls(playlist_info: list[PlaylistInfo]) -> list[str]:
     """Repeatedly calls get_song_url on given playlist info. Returns list of results."""
     urls = []
-    
+
     for song_info in playlist_info:
         print(f"Getting url for {song_info['title']}")
-        result = get_song_url(song_info)
-        urls.append(result[0])
-        print(f"{result[1]} ({result[0]})")
+        url, title = get_song_url(song_info)
+        urls.append(url)
+        print(f"{title} ({url})")
         sleep(uniform(1, 3))
 
     return urls
 
-def download_from_urls(urls):
+
+def download_from_urls(urls: list[str]) -> None:
     """Downloads list of songs with yt-dlp"""
 
     # options generated from https://github.com/yt-dlp/yt-dlp/blob/master/devscripts/cli_to_api.py
@@ -101,11 +115,13 @@ def download_from_urls(urls):
     # downloads stream with highest bitrate, then save them in m4a format
     with YoutubeDL(options) as ydl:
         ydl.download(urls)
-    
-def main(playlist_id):
+
+
+def main(playlist_id: str):
     playlist_info = get_playlist_info(playlist_id)
     download_urls = get_song_urls(playlist_info)
     download_from_urls(download_urls)
-    
+
+
 if __name__ == "__main__":
     main("https://open.spotify.com/playlist/2LE8ZObOZOqjsGrR6QFXwu?si=9b4a5deb005148e1") # test
