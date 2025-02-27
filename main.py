@@ -27,11 +27,23 @@ def get_playlist_info(playlist_id: str) -> list[PlaylistInfo]:
 
     for item in items:
         item = item["itemV2"]["data"]
-        song: PlaylistInfo = {
-            "title": item["name"],
-            "artist": item["artists"]["items"][0]["profile"]["name"],
-            "length": int(item["trackDuration"]["totalMilliseconds"])
-        }
+
+        # sanity check: only two cases found
+        assert item["__typename"] in ("Track", "LocalTrack")
+        
+        if item["__typename"] == "Track":
+            song: PlaylistInfo = {
+                "title": item["name"],
+                "artist": item["artists"]["items"][0]["profile"]["name"],
+                "length": int(item["trackDuration"]["totalMilliseconds"])
+            }
+        else:
+            song: PlaylistInfo = {
+                "title": item["name"],
+                "artist": item["artistName"],
+                "length": int(item["localTrackDuration"]["totalMilliseconds"])
+            }
+            
         result.append(song)
 
     return result
