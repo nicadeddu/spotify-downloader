@@ -51,7 +51,11 @@ def get_playlist_info(playlist_id: str) -> list[PlaylistInfo]:
 
 def convert_to_milliseconds(text: str) -> int:
     """Converts `"%M:%S"` timestamp from YTMusic to milliseconds."""
-    minutes, seconds = text.split(":")
+    try:
+        minutes, seconds = text.split(":")
+    except ValueError:  # text is not duration: result is neither song nor video
+        return 0
+        
     return (int(minutes) * 60 + int(seconds)) * 1000
 
 
