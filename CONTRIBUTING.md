@@ -6,10 +6,14 @@ When contributing to this repository, please first discuss the change you wish t
 > We assume that you have read the available documentation before reporting any issues or asking any questions.
 
 Please follow these steps when reporting an issue or asking a question:
-- Make sure you are using the latest version.
-- Search through the open issues to ensure it's not a duplicate.
-- Describe the issue clearly with steps to reproduce it, if possible. (including the Spotify playlist link used)
-- Provide as much context as you can about the issue or question.
+- Ensure you are using the latest version.
+- Search through open issues to ensure it's not a duplicate.
+- Describe the issue clearly with steps to reproduce it, if possible.
+- Provide all relevant input values (e.g., Spotify playlist links) and the output results.
+- Use suitable and clear formatting, such as code blocks, headings, and bullet points.
+- In general, provide as much context as possible about the issue or question.
+
+We appreciate your help in improving the project and making the issue resolution process smoother!
 
 ## How to Contribute Code
 1. Fork the repository.
