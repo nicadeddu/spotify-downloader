@@ -30,9 +30,11 @@ Unlike most downloader, this program does not require a Spotify Developers accou
 Alternatively, install from [requirements.txt](requirements.txt) using pip (and FFmpeg build from the official website).
 
 ## Contributing
-Contributions are welcome! Please open an issue or submit a pull request if you find issues or have suggestions.
+Contributions are welcome! If you'd like to contribute, please read our [CONTRIBUTING.md](CONTRIBUTING.md) guide for details on how to get started.
 
-This project uses flake8 for linting. Please ensure your code passes flake8 linting before submitting a pull request.
+By following the guidelines, you can ensure your contributions fit with the overall direction of the project, align with the project's standards, and are easy to review.
+
+Your participation and interest in contributing is greatly appreciated, and we look forward to collaborating with you!
 
 ## License
 This software is licensed under the [MIT License](https://github.com/invzfnc/spotify-downloader/blob/main/LICENSE) © [Cha](https://github.com/invzfnc)
