@@ -1,8 +1,43 @@
 import sys
+import argparse
+import traceback
+
 from main import main
 
-if len(sys.argv) < 2:
-    print("error: playlist id/url required. aborting process.")
-    exit()
 
-main(sys.argv[1])
+def parse_arguments() -> argparse.Namespace:
+    """Parses command line arguments and returns them."""
+
+    parser = argparse.ArgumentParser(
+        description="Download songs from Spotify playlist"
+    )
+
+    parser.add_argument(
+        "playlist_url",
+        help="spotify playlist URL or ID"
+    )
+
+    parser.add_argument(
+        "-o", "--output-dir",
+        default="./downloads/",
+        help="output directory for downloading songs (default: ./downloads)"
+    )
+
+    return parser.parse_args()
+
+
+if __name__ == "__main__":
+    args = parse_arguments()
+
+    print(f"Starting download from {args.playlist_url} to {args.output_dir}")
+
+    try:
+        main(args.playlist_url, args.output_dir)
+
+        print("Download completed.")
+        sys.exit(0)
+
+    except Exception:
+        print(traceback.format_exc())
+        print("If you'd like to report this issue, please include the message above when opening issues on GitHub. For detailed instructions, see CONTRIBUTING.md")  # noqa: E501
+        sys.exit(1)

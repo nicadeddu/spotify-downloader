@@ -1,13 +1,12 @@
 from typing import TypedDict
+from time import sleep
+from random import uniform
 
 from spotapi import Public
 from innertube import InnerTube
 from yt_dlp import YoutubeDL
 
-from time import sleep
-from random import uniform
-
-DOWNLOAD_PATH = "./downloads/"  # ends with "/"
+DOWNLOAD_PATH = "./downloads/"
 client = None
 
 
@@ -109,8 +108,11 @@ def get_song_urls(playlist_info: list[PlaylistInfo]) -> list[str]:
     return urls
 
 
-def download_from_urls(urls: list[str]) -> None:
+def download_from_urls(urls: list[str], output_dir: str) -> None:
     """Downloads list of songs with yt-dlp"""
+
+    if not output_dir.endswith("/"):
+        output_dir += "/"
 
     # options generated from https://github.com/yt-dlp/yt-dlp/blob/master/devscripts/cli_to_api.py  # noqa: E501
     options = {"extract_flat": "discard_in_playlist",
@@ -118,7 +120,7 @@ def download_from_urls(urls: list[str]) -> None:
                "format": "bestaudio/best",
                "fragment_retries": 10,
                "ignoreerrors": "only_download",
-               "outtmpl": {"default": f"{DOWNLOAD_PATH}%(title)s.%(ext)s"},
+               "outtmpl": {"default": f"{output_dir}%(title)s.%(ext)s"},
                "postprocessors": [{"key": "FFmpegExtractAudio",
                                    "nopostoverwrites": False,
                                    "preferredcodec": "m4a",
@@ -137,10 +139,10 @@ def download_from_urls(urls: list[str]) -> None:
         ydl.download(urls)
 
 
-def main(playlist_id: str):
+def main(playlist_id: str, output_dir: str = DOWNLOAD_PATH) -> None:
     playlist_info = get_playlist_info(playlist_id)
     download_urls = get_song_urls(playlist_info)
-    download_from_urls(download_urls)
+    download_from_urls(download_urls, output_dir)
 
 
 if __name__ == "__main__":
