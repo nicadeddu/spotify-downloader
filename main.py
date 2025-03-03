@@ -30,20 +30,22 @@ def get_playlist_info(playlist_id: str) -> list[PlaylistInfo]:
 
         # sanity check: only two cases found
         assert item["__typename"] in ("Track", "LocalTrack")
-        
+
+        song: PlaylistInfo
+
         if item["__typename"] == "Track":
-            song: PlaylistInfo = {
+            song = {
                 "title": item["name"],
                 "artist": item["artists"]["items"][0]["profile"]["name"],
                 "length": int(item["trackDuration"]["totalMilliseconds"])
             }
         else:
-            song: PlaylistInfo = {
+            song = {
                 "title": item["name"],
                 "artist": item["artistName"],
                 "length": int(item["localTrackDuration"]["totalMilliseconds"])
             }
-            
+
         result.append(song)
 
     return result
@@ -53,9 +55,9 @@ def convert_to_milliseconds(text: str) -> int:
     """Converts `"%M:%S"` timestamp from YTMusic to milliseconds."""
     try:
         minutes, seconds = text.split(":")
-    except ValueError:  # text is not duration: result is neither song nor video
+    except ValueError:  # text is not duration: result's neither song nor video
         return 0
-        
+
     return (int(minutes) * 60 + int(seconds)) * 1000
 
 
