@@ -33,6 +33,8 @@ We appreciate your help in improving the project and making the issue resolution
     - Tests
     - More robust error checking systems
     - Graphical user interface
+    - Support for embed album art
+    - Logger
 
 ## Contribution Areas
 We welcome contribution in the following areas:

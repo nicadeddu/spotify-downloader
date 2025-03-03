@@ -32,9 +32,7 @@ Alternatively, install from [requirements.txt](requirements.txt) using pip (and 
 ## Contributing
 Contributions are welcome! If you'd like to contribute, please read our [CONTRIBUTING.md](CONTRIBUTING.md) guide for details on how to get started.
 
-If you have encountered problems and wish to open an issue, please see [CONTRIBUTING.md](CONTRIBUTING.md#reporting-issuesasking-questions) for detailed instructions.
-
-By following the guidelines, you can ensure your contributions fit with the overall direction of the project, align with the project's standards, and are easy to review.
+If you have encountered problems and wish to open an issue, please read the [guidelines](CONTRIBUTING.md#reporting-issuesasking-questions) for detailed instructions.
 
 ## License
 This software is licensed under the [MIT License](https://github.com/invzfnc/spotify-downloader/blob/main/LICENSE) © [Cha](https://github.com/invzfnc)
