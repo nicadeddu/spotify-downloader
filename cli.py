@@ -1,3 +1,6 @@
+__version__ = "1.0.0"
+__author__ = "Cha @github.com/invzfnc"
+
 import sys
 import argparse
 import traceback
@@ -21,6 +24,13 @@ def parse_arguments() -> argparse.Namespace:
         "-o", "--output-dir",
         default="./downloads/",
         help="output directory for downloading songs (default: ./downloads)"
+    )
+
+    parser.add_argument(
+        "--version",
+        action="version",
+        version=f"{__version__}",
+        help="show version number and exit"
     )
 
     return parser.parse_args()
