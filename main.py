@@ -1,3 +1,6 @@
+__version__ = "1.0.0"
+__author__ = "Cha @github.com/invzfnc"
+
 from typing import TypedDict
 from time import sleep
 from random import uniform
@@ -115,24 +118,36 @@ def download_from_urls(urls: list[str], output_dir: str) -> None:
         output_dir += "/"
 
     # options generated from https://github.com/yt-dlp/yt-dlp/blob/master/devscripts/cli_to_api.py  # noqa: E501
-    options = {"extract_flat": "discard_in_playlist",
-               "final_ext": "m4a",
-               "format": "bestaudio/best",
-               "fragment_retries": 10,
-               "ignoreerrors": "only_download",
-               "outtmpl": {"default": f"{output_dir}%(title)s.%(ext)s"},
-               "postprocessors": [{"key": "FFmpegExtractAudio",
-                                   "nopostoverwrites": False,
-                                   "preferredcodec": "m4a",
-                                   "preferredquality": "5"},
-                                  {"add_chapters": True,
-                                   "add_infojson": "if_exists",
-                                   "add_metadata": True,
-                                   "key": "FFmpegMetadata"},
-                                  {"key": "FFmpegConcat",
-                                   "only_multi_video": True,
-                                   "when": "playlist"}],
-               "retries": 10}
+
+    options = {'extract_flat': 'discard_in_playlist',
+               'final_ext': 'm4a',
+               'format': 'bestaudio/best',
+               'fragment_retries': 10,
+               'ignoreerrors': 'only_download',
+               'outtmpl': {'default': f'{output_dir}%(title)s.%(ext)s',
+                           'pl_thumbnail': ''},
+               'postprocessor_args': {'ffmpeg': ['-c:v',
+                                                 'mjpeg',
+                                                 '-vf',
+                                                 "crop='if(gt(ih,iw),iw,ih)':'if(gt(iw,ih),ih,iw)'"]},  # noqa: E501
+               'postprocessors': [{'format': 'jpg',
+                                   'key': 'FFmpegThumbnailsConvertor',
+                                   'when': 'before_dl'},
+                                  {'key': 'FFmpegExtractAudio',
+                                   'nopostoverwrites': False,
+                                   'preferredcodec': 'm4a',
+                                   'preferredquality': '5'},
+                                  {'add_chapters': True,
+                                   'add_infojson': 'if_exists',
+                                   'add_metadata': True,
+                                   'key': 'FFmpegMetadata'},
+                                  {'already_have_thumbnail': False,
+                                   'key': 'EmbedThumbnail'},
+                                  {'key': 'FFmpegConcat',
+                                   'only_multi_video': True,
+                                   'when': 'playlist'}],
+               'retries': 10,
+               'writethumbnail': True}
 
     # downloads stream with highest bitrate, then save them in m4a format
     with YoutubeDL(options) as ydl:
