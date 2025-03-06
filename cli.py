@@ -47,6 +47,9 @@ if __name__ == "__main__":
         print("Download completed.")
         sys.exit(0)
 
+    except KeyboardInterrupt:
+        print("Program terminated by user.")
+
     except Exception:
         print(traceback.format_exc())
         print("If you'd like to report this issue, please include the message above when opening issues on GitHub. For detailed instructions, see CONTRIBUTING.md")  # noqa: E501
