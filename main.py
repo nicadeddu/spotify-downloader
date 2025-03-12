@@ -1,9 +1,10 @@
-__version__ = "1.0.0"
+__version__ = "1.0.1"
 __author__ = "Cha @github.com/invzfnc"
 
 from typing import TypedDict
 from time import sleep
 from random import uniform
+from sys import exit
 
 from spotapi import Public
 from innertube import InnerTube
@@ -23,9 +24,12 @@ def get_playlist_info(playlist_id: str) -> list[PlaylistInfo]:
     """Extracts data from Spotify and return them in format
        `[{"title": title, "artist": artist, "length": length}]`."""
 
-    items = next(Public.playlist_info(playlist_id))["items"]
-
     result: list[PlaylistInfo] = []
+
+    try:
+        items = next(Public.playlist_info(playlist_id))["items"]
+    except KeyError:
+        return result
 
     for item in items:
         item = item["itemV2"]["data"]
@@ -57,7 +61,7 @@ def convert_to_milliseconds(text: str) -> int:
     """Converts `"%M:%S"` timestamp from YTMusic to milliseconds."""
     try:
         minutes, seconds = text.split(":")
-    except ValueError:  # text is not duration: result's neither song nor video
+    except ValueError:  # text is not duration
         return 0
 
     return (int(minutes) * 60 + int(seconds)) * 1000
@@ -76,24 +80,37 @@ def get_song_url(song_info: PlaylistInfo) -> tuple[str, str]:
     if "itemSectionRenderer" in data["contents"]["tabbedSearchResultsRenderer"]["tabs"][0]["tabRenderer"]["content"]["sectionListRenderer"]["contents"][0]:  # noqa: E501
         del data["contents"]["tabbedSearchResultsRenderer"]["tabs"][0]["tabRenderer"]["content"]["sectionListRenderer"]["contents"][0]  # noqa: E501
 
-    top_result_length = data["contents"]["tabbedSearchResultsRenderer"]["tabs"][0]["tabRenderer"]["content"]["sectionListRenderer"]["contents"][0]["musicCardShelfRenderer"]["subtitle"]["runs"][-1]["text"]  # noqa: E501
-    first_song_length = data["contents"]["tabbedSearchResultsRenderer"]["tabs"][0]["tabRenderer"]["content"]["sectionListRenderer"]["contents"][1]["musicShelfRenderer"]["contents"][0]["musicResponsiveListItemRenderer"]["flexColumns"][1]["musicResponsiveListItemFlexColumnRenderer"]["text"]["runs"][-1]["text"]  # noqa: E501
+    # get first song result info, will succeed unless case is too extreme
+    try:
+        first_song_id = data["contents"]["tabbedSearchResultsRenderer"]["tabs"][0]["tabRenderer"]["content"]["sectionListRenderer"]["contents"][1]["musicShelfRenderer"]["contents"][0]["musicResponsiveListItemRenderer"]["overlay"]["musicItemThumbnailOverlayRenderer"]["content"]["musicPlayButtonRenderer"]["playNavigationEndpoint"]["watchEndpoint"]["videoId"]  # noqa: E501
+        first_song_title = data["contents"]["tabbedSearchResultsRenderer"]["tabs"][0]["tabRenderer"]["content"]["sectionListRenderer"]["contents"][1]["musicShelfRenderer"]["contents"][0]["musicResponsiveListItemRenderer"]["flexColumns"][0]["musicResponsiveListItemFlexColumnRenderer"]["text"]["runs"][0]["text"]  # noqa: E501
+        first_song_length = data["contents"]["tabbedSearchResultsRenderer"]["tabs"][0]["tabRenderer"]["content"]["sectionListRenderer"]["contents"][1]["musicShelfRenderer"]["contents"][0]["musicResponsiveListItemRenderer"]["flexColumns"][1]["musicResponsiveListItemFlexColumnRenderer"]["text"]["runs"][-1]["text"]  # noqa: E501
+        first_song_diff = abs(convert_to_milliseconds(first_song_length) - song_info["length"])  # noqa: E501
+    except (KeyError, IndexError):
+        first_song_length = 0
 
-    top_result_diff = abs(convert_to_milliseconds(top_result_length) - song_info["length"])  # noqa: E501
-    first_song_diff = abs(convert_to_milliseconds(first_song_length) - song_info["length"])  # noqa: E501
+    # get top result info, fails if it's neither Song nor Video
+    try:
+        top_result_id = data["contents"]["tabbedSearchResultsRenderer"]["tabs"][0]["tabRenderer"]["content"]["sectionListRenderer"]["contents"][0]["musicCardShelfRenderer"]["title"]["runs"][0]["navigationEndpoint"]["watchEndpoint"]["videoId"]  # noqa: E501
+        top_result_title = data["contents"]["tabbedSearchResultsRenderer"]["tabs"][0]["tabRenderer"]["content"]["sectionListRenderer"]["contents"][0]["musicCardShelfRenderer"]["title"]["runs"][0]["text"]  # noqa: E501
+        top_result_length = data["contents"]["tabbedSearchResultsRenderer"]["tabs"][0]["tabRenderer"]["content"]["sectionListRenderer"]["contents"][0]["musicCardShelfRenderer"]["subtitle"]["runs"][-1]["text"]  # noqa: E501
+        top_result_diff = abs(convert_to_milliseconds(top_result_length) - song_info["length"])  # noqa: E501
+    except (KeyError, IndexError):
+        top_result_length = 0
 
-    if top_result_diff < first_song_diff:
-        # get top result url
-        video_id = data["contents"]["tabbedSearchResultsRenderer"]["tabs"][0]["tabRenderer"]["content"]["sectionListRenderer"]["contents"][0]["musicCardShelfRenderer"]["title"]["runs"][0]["navigationEndpoint"]["watchEndpoint"]["videoId"]  # noqa: E501
-        video_title = data["contents"]["tabbedSearchResultsRenderer"]["tabs"][0]["tabRenderer"]["content"]["sectionListRenderer"]["contents"][0]["musicCardShelfRenderer"]["title"]["runs"][0]["text"]  # noqa: E501
+    url_part = "https://music.youtube.com/watch?v="
+
+    if first_song_length and top_result_length:
+        if top_result_diff < first_song_diff:
+            return url_part + top_result_id, top_result_title
+        else:
+            return url_part + first_song_id, first_song_title
+    elif top_result_length:
+        return url_part + top_result_id, top_result_title
+    elif first_song_length:
+        return url_part + first_song_id, first_song_title
     else:
-        # get first song result url
-        video_id = data["contents"]["tabbedSearchResultsRenderer"]["tabs"][0]["tabRenderer"]["content"]["sectionListRenderer"]["contents"][1]["musicShelfRenderer"]["contents"][0]["musicResponsiveListItemRenderer"]["overlay"]["musicItemThumbnailOverlayRenderer"]["content"]["musicPlayButtonRenderer"]["playNavigationEndpoint"]["watchEndpoint"]["videoId"]  # noqa: E501
-        video_title = data["contents"]["tabbedSearchResultsRenderer"]["tabs"][0]["tabRenderer"]["content"]["sectionListRenderer"]["contents"][1]["musicShelfRenderer"]["contents"][0]["musicResponsiveListItemRenderer"]["flexColumns"][0]["musicResponsiveListItemFlexColumnRenderer"]["text"]["runs"][0]["text"]  # noqa: E501
-
-    url = "https://music.youtube.com/watch?v=" + video_id
-
-    return url, video_title
+        return ("", "")
 
 
 def get_song_urls(playlist_info: list[PlaylistInfo]) -> list[str]:
@@ -104,8 +121,13 @@ def get_song_urls(playlist_info: list[PlaylistInfo]) -> list[str]:
     for song_info in playlist_info:
         print(f"Getting url for {song_info['title']}")
         url, title = get_song_url(song_info)
-        urls.append(url)
-        print(f"{title} ({url})")
+
+        if url:
+            urls.append(url)
+            print(f"Matched {title} ({url})")
+        else:
+            print(f"Failed matching for {song_info['title']}")
+
         sleep(uniform(1, 3))
 
     return urls
@@ -118,7 +140,6 @@ def download_from_urls(urls: list[str], output_dir: str) -> None:
         output_dir += "/"
 
     # options generated from https://github.com/yt-dlp/yt-dlp/blob/master/devscripts/cli_to_api.py  # noqa: E501
-
     options = {'extract_flat': 'discard_in_playlist',
                'final_ext': 'm4a',
                'format': 'bestaudio/best',
@@ -156,6 +177,11 @@ def download_from_urls(urls: list[str], output_dir: str) -> None:
 
 def main(playlist_id: str, output_dir: str = DOWNLOAD_PATH) -> None:
     playlist_info = get_playlist_info(playlist_id)
+
+    if not playlist_info:
+        print("Invalid playlist URL. Aborting operation.")
+        exit(0)
+
     download_urls = get_song_urls(playlist_info)
     download_from_urls(download_urls, output_dir)
 

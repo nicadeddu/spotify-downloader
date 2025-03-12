@@ -1,4 +1,4 @@
-__version__ = "1.0.0"
+__version__ = "1.0.1"
 __author__ = "Cha @github.com/invzfnc"
 
 import sys
@@ -46,6 +46,9 @@ if __name__ == "__main__":
 
         print("Download completed.")
         sys.exit(0)
+
+    except KeyboardInterrupt:
+        print("Program terminated by user.")
 
     except Exception:
         print(traceback.format_exc())
