@@ -1,4 +1,4 @@
-__version__ = "1.0.1"
+__version__ = "1.0.2"
 __author__ = "Cha @github.com/invzfnc"
 
 from typing import TypedDict
@@ -34,8 +34,10 @@ def get_playlist_info(playlist_id: str) -> list[PlaylistInfo]:
     for item in items:
         item = item["itemV2"]["data"]
 
-        # sanity check: only two cases found
-        assert item["__typename"] in ("Track", "LocalTrack")
+        assert item["__typename"] in ("Track", "LocalTrack",
+                                      "RestrictedContent", "NotFound")
+        # RestrictedContent and NotFound:
+        # Hidden entries, not actual songs in playlist
 
         song: PlaylistInfo
 
@@ -45,12 +47,14 @@ def get_playlist_info(playlist_id: str) -> list[PlaylistInfo]:
                 "artist": item["artists"]["items"][0]["profile"]["name"],
                 "length": int(item["trackDuration"]["totalMilliseconds"])
             }
-        else:
+        elif item["__typename"] == "LocalTrack":
             song = {
                 "title": item["name"],
                 "artist": item["artistName"],
                 "length": int(item["localTrackDuration"]["totalMilliseconds"])
             }
+        else:
+            continue
 
         result.append(song)
 
