@@ -1,7 +1,11 @@
 __pycache__/
+.mypy_cache/
+
 venv/
 
-.mypy_cache/
+build/
+dist/
+*.spec
 
 downloads/
 ignore/
