@@ -9,6 +9,7 @@ httpx==0.23.3
 idna==3.10
 innertube==2.1.16
 mediate==0.1.8
+mutagen==1.47.0
 pillow==11.1.0
 pymongo==4.10.1
 readerwriterlock==1.0.9
