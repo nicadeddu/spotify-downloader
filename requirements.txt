@@ -12,6 +12,7 @@ mediate==0.1.8
 mutagen==1.47.0
 pillow==11.1.0
 pymongo==4.10.1
+pyinstaller==6.5.0
 readerwriterlock==1.0.9
 redis==5.2.1
 requests==2.32.3

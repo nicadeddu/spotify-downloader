@@ -58,7 +58,7 @@ Unlike most downloader, this program **does not** require a Spotify Developers a
 2. Create and activate a virtual environment (Optional but recommended).
 
    ```sh
-   python -m venv venv
+   python3 -m venv venv
    venv\Scripts\activate.bat  # Windows
    # or
    source venv/bin/activate   # Linux/macOS
@@ -67,25 +67,25 @@ Unlike most downloader, this program **does not** require a Spotify Developers a
 3. Install required dependencies.
 
    ```sh
-   python -m pip install -r requirements.txt
+   python3 -m pip install -r requirements.txt
    ```
    
 4. Run the program with your playlist URL.
 
    ```sh
-   python -m cli playlist_url
+   python3 -m cli playlist_url
    ```
 
 **Available Options**
 - To get help on available options:
 
   ```sh
-  python -m cli --help
+  python3 -m cli --help
   ```
 
 - To specify where to store dowloaded files:
   ```sh
-  python -m cli -o path playlist_url
+  python3 -m cli -o path playlist_url
   ```
 
 ## Issues?
