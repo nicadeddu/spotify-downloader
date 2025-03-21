@@ -47,6 +47,15 @@ jobs:
       - name: Debug - Python version
         run: python --version
 
+      # Installa tkinter su Ubuntu
+      - name: Install tkinter (Ubuntu)
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3-tk
+          echo "Tkinter installed"
+          python -c "import tkinter; print('Tkinter version:', tkinter.TkVersion)"
+
       - name: Install FFmpeg (Ubuntu)
         if: matrix.os == 'ubuntu-latest'
         run: |
@@ -76,6 +85,15 @@ jobs:
           echo "Installing PyInstaller..."
           pip install pyinstaller
           pip list
+
+      - name: Debug - Verify GUI libraries
+        run: |
+          python -c "import sys; print('Python path:', sys.path)"
+          if [ "${{ matrix.os }}" = "ubuntu-latest" ]; then
+            python -c "import tkinter; print('Tkinter OK')" || echo "Tkinter still not working"
+          fi
+        shell: bash
+        continue-on-error: true
 
       - name: Debug - Verify gui.py exists
         run: |
